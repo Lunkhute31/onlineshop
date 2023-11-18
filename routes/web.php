@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\admin\AdminLoginController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,4 +18,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('admin/login',[AdminLoginController::class,'index'])->name('admin.login');
+
+Route::group(['prefix'=>'admin'],function (){
+
+    Route::group(['middleware'=>'admin.guest'],function(){
+        Route::get('/login',[AdminLoginController::class,'index'])->name('admin.login');
+        Route::post('/check',[AdminLoginController::class,'check'])->name('admin.check');
+    });
+    Route::group(['middleware'=>'admin.check'],function(){
+        Route::get('/dashboard',[HomeController::class,'index'])->name('dashboard.index');
+    });
+});
